@@ -59,22 +59,56 @@ public class Trumpet : MonoBehaviour {
     }
 
 
+    public int octave;
     private AudioClip GetPlayedNote() {
-        int octave = GetOctave();
+        //octave = GetOctave();
 
-        switch (GetValveCombination()) {
-            case 0: return soundLibrary.GetNote(octave, NOTES.C);
-            case 1: return soundLibrary.GetNote(octave, NOTES.F);
-            case 2: return soundLibrary.GetNote(octave, NOTES.Fs);
-            case 3: return soundLibrary.GetNote(octave, NOTES.E);
-            case 4: return soundLibrary.GetNote(octave, NOTES.D);
-            case 5: return soundLibrary.GetNote(octave, NOTES.Ds);
-            case 6: return soundLibrary.GetNote(octave, NOTES.Ds);
-            case 7: return soundLibrary.GetNote(octave, NOTES.Cs);
-            default: 
-                Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
-                return null;
+        if (octave == 2) {
+            switch (GetValveCombination()) {
+                //case 0: return soundLibrary.GetNote(octave, NOTES.G);
+                case 1: return soundLibrary.GetNote(octave, NOTES.As);
+                case 2: return soundLibrary.GetNote(octave, NOTES.B);
+                case 3: return soundLibrary.GetNote(octave, NOTES.A);
+                //case 4: return soundLibrary.GetNote(octave, NOTES.?);
+                case 5: return soundLibrary.GetNote(octave, NOTES.G);
+                case 6: return soundLibrary.GetNote(octave, NOTES.Gs);
+                case 7: return soundLibrary.GetNote(octave, NOTES.Fs);
+                default:
+                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    return null;
+            }
+        } else if (octave == 3) {
+            switch (GetValveCombination()) {
+                case 0: return soundLibrary.GetNote(octave, NOTES.C);
+                case 1: return soundLibrary.GetNote(octave, NOTES.F);
+                case 2: return soundLibrary.GetNote(octave, NOTES.Fs);
+                case 3: return soundLibrary.GetNote(octave, NOTES.E);
+                case 4: return soundLibrary.GetNote(octave, NOTES.D);
+                case 5: return soundLibrary.GetNote(octave, NOTES.Ds);
+                case 6: return soundLibrary.GetNote(octave, NOTES.Ds);
+                case 7: return soundLibrary.GetNote(octave, NOTES.Cs);
+                default:
+                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    return null;
+            }
+        } else if (octave == 4) {
+            switch (GetValveCombination()) {
+                case 0: return soundLibrary.GetNote(octave, NOTES.G);
+                case 1: return soundLibrary.GetNote(octave, NOTES.As);
+                case 2: return soundLibrary.GetNote(octave, NOTES.B);
+                case 3: return soundLibrary.GetNote(octave, NOTES.A);
+                //case 4: return soundLibrary.GetNote(octave, NOTES.?);
+                //case 5: return soundLibrary.GetNote(octave, NOTES.?);
+                case 6: return soundLibrary.GetNote(octave, NOTES.Gs);
+                //case 7: return soundLibrary.GetNote(octave, NOTES.?);
+                default:
+                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    return null;
+            }
         }
+
+        Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+        return null;
     }
 
     private int GetOctave() {
