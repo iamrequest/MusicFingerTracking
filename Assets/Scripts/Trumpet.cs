@@ -12,53 +12,103 @@ public class Trumpet : MonoBehaviour {
 
     private Hand hand;
     public SteamVR_Action_Skeleton skeletonAction;
-    public SteamVR_Action_Boolean playSoundAction;
+    public SteamVR_Action_Vector2 playSoundAction;
 
     [Tooltip("The minimum amount of finger curl to count as pressing a valve down")]
     [Range(0f, 1f)]
     public float fingerPressThreshold;
 
+    [Tooltip("The absoulute minimum amount of vertical axis to count as playing a note")]
+    [Range(0f, 1f)]
+    public float notePlayThreshold;
+
     // Start is called before the first frame update
     void Start() {
         audioSource = GetComponent<AudioSource>();
+        audioSource.loop = true;
 
         hand = GetComponentInParent<Hand>();
-        playSoundAction.AddOnStateDownListener(PlayAudio, hand.handType);
-        playSoundAction.AddOnStateUpListener(StopAudio, hand.handType);
+        playSoundAction.AddOnChangeListener(PlayAudio, hand.handType);
     }
 
     // Update is called once per frame
     void Update() {
-        //Debug.Log(skeletonAction.indexCurl);
-    }
+        AudioClip previousClip = audioSource.clip;
+        AudioClip newClip = GetPlayedNote();
 
-    private void StopAudio(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
-        audioSource.Stop();
-    }
-
-    // TODO: This should be an update function, and should change the audio clip when the played note changes
-    private void PlayAudio(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
-        audioSource.clip = GetPlayedNote();
-        audioSource.loop = true;
-        audioSource.Play();
-    }
-
-    private AudioClip GetPlayedNote() {
-        int octave = GetOctave();
-
-        switch (GetValveCombination()) {
-            case 0: return soundLibrary.GetNote(octave, NOTES.C);
-            case 1: return soundLibrary.GetNote(octave, NOTES.F);
-            case 2: return soundLibrary.GetNote(octave, NOTES.Fs);
-            case 3: return soundLibrary.GetNote(octave, NOTES.E);
-            case 4: return soundLibrary.GetNote(octave, NOTES.D);
-            case 5: return soundLibrary.GetNote(octave, NOTES.D);
-            case 6: return soundLibrary.GetNote(octave, NOTES.Ds);
-            case 7: return soundLibrary.GetNote(octave, NOTES.Cs);
-            default: 
-                Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
-                return null;
+        // If the audio clip changed, we need to restart the audio source
+        if (previousClip != newClip) {
+            if (audioSource.isPlaying) {
+                audioSource.Stop();
+                audioSource.clip = newClip;
+                audioSource.Play();
+            } else {
+                audioSource.clip = newClip;
+            }
         }
+    }
+
+    private void PlayAudio(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta) {
+        if (Mathf.Abs(axis.y) > notePlayThreshold) {
+            if(!audioSource.isPlaying) audioSource.Play();
+
+            audioSource.volume = RemapFloat(Mathf.Abs(axis.y), notePlayThreshold, 1f, 0f, 1f);
+        } else {
+            audioSource.Stop();
+        }
+    }
+
+
+    public int octave;
+    private AudioClip GetPlayedNote() {
+        //octave = GetOctave();
+
+        if (octave == 2) {
+            switch (GetValveCombination()) {
+                //case 0: return soundLibrary.GetNote(octave, NOTES.G);
+                case 1: return soundLibrary.GetNote(octave, NOTES.As);
+                case 2: return soundLibrary.GetNote(octave, NOTES.B);
+                case 3: return soundLibrary.GetNote(octave, NOTES.A);
+                //case 4: return soundLibrary.GetNote(octave, NOTES.?);
+                case 5: return soundLibrary.GetNote(octave, NOTES.G);
+                case 6: return soundLibrary.GetNote(octave, NOTES.Gs);
+                case 7: return soundLibrary.GetNote(octave, NOTES.Fs);
+                default:
+                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    return null;
+            }
+        } else if (octave == 3) {
+            switch (GetValveCombination()) {
+                case 0: return soundLibrary.GetNote(octave, NOTES.C);
+                case 1: return soundLibrary.GetNote(octave, NOTES.F);
+                case 2: return soundLibrary.GetNote(octave, NOTES.Fs);
+                case 3: return soundLibrary.GetNote(octave, NOTES.E);
+                case 4: return soundLibrary.GetNote(octave, NOTES.D);
+                case 5: return soundLibrary.GetNote(octave, NOTES.Ds);
+                case 6: return soundLibrary.GetNote(octave, NOTES.Ds);
+                case 7: return soundLibrary.GetNote(octave, NOTES.Cs);
+                default:
+                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    return null;
+            }
+        } else if (octave == 4) {
+            switch (GetValveCombination()) {
+                case 0: return soundLibrary.GetNote(octave, NOTES.G);
+                case 1: return soundLibrary.GetNote(octave, NOTES.As);
+                case 2: return soundLibrary.GetNote(octave, NOTES.B);
+                case 3: return soundLibrary.GetNote(octave, NOTES.A);
+                //case 4: return soundLibrary.GetNote(octave, NOTES.?);
+                //case 5: return soundLibrary.GetNote(octave, NOTES.?);
+                case 6: return soundLibrary.GetNote(octave, NOTES.Gs);
+                //case 7: return soundLibrary.GetNote(octave, NOTES.?);
+                default:
+                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    return null;
+            }
+        }
+
+        Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+        return null;
     }
 
     private int GetOctave() {
@@ -89,5 +139,9 @@ public class Trumpet : MonoBehaviour {
         }
 
         return valveCombo;
+    }
+
+    private float RemapFloat(float value, float from1, float to1, float from2, float to2) {
+        return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
     }
 }
