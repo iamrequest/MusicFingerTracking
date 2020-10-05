@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum NOTES { A, As, B , C, Cs, D, Ds, E, F, Fs, G, Gs};
+public enum NOTES { C, Cs, D, Ds, E, F, Fs, G, Gs, A, As, B};
 [CreateAssetMenu(fileName = "Data", menuName = "ScriptableObjects/SpawnAudioLibrary", order = 1)]
 public class AudioLibrary : ScriptableObject {
     const int NOTES_IN_OCTAVE = 12;

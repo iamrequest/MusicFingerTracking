@@ -322,7 +322,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bc9100c0aded5e945b6488e39971af7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  soundLibrary: {fileID: 11400000, guid: b6059ca0ea54ed044b8f6f29439f7804, type: 2}
+  soundLibrary: {fileID: 11400000, guid: e7bc533861db8574c9ba1f6e55e08e37, type: 2}
   skeletonAction:
     actionPath: /actions/default/in/SkeletonRightHand
     needsReinit: 0

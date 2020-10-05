@@ -21,26 +21,36 @@ public class Trumpet : MonoBehaviour {
     // Start is called before the first frame update
     void Start() {
         audioSource = GetComponent<AudioSource>();
+        audioSource.loop = true;
 
         hand = GetComponentInParent<Hand>();
-        playSoundAction.AddOnStateDownListener(PlayAudio, hand.handType);
-        playSoundAction.AddOnStateUpListener(StopAudio, hand.handType);
+        playSoundAction.AddOnChangeListener(PlayAudio, hand.handType);
     }
 
     // Update is called once per frame
     void Update() {
-        //Debug.Log(skeletonAction.indexCurl);
-    }
+        AudioClip previousClip = audioSource.clip;
+        AudioClip newClip = GetPlayedNote();
 
-    private void StopAudio(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
-        audioSource.Stop();
+        // If the audio clip changed, we need to restart the audio source
+        if (previousClip != newClip) {
+            if (audioSource.isPlaying) {
+                audioSource.Stop();
+                audioSource.clip = newClip;
+                audioSource.Play();
+            } else {
+                audioSource.clip = newClip;
+            }
+        }
     }
 
     // TODO: This should be an update function, and should change the audio clip when the played note changes
-    private void PlayAudio(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource) {
-        audioSource.clip = GetPlayedNote();
-        audioSource.loop = true;
-        audioSource.Play();
+    private void PlayAudio(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource, bool newState) {
+        if (!newState) {
+            audioSource.Stop();
+        } else {
+            audioSource.Play();
+        }
     }
 
     private AudioClip GetPlayedNote() {
@@ -52,7 +62,7 @@ public class Trumpet : MonoBehaviour {
             case 2: return soundLibrary.GetNote(octave, NOTES.Fs);
             case 3: return soundLibrary.GetNote(octave, NOTES.E);
             case 4: return soundLibrary.GetNote(octave, NOTES.D);
-            case 5: return soundLibrary.GetNote(octave, NOTES.D);
+            case 5: return soundLibrary.GetNote(octave, NOTES.Ds);
             case 6: return soundLibrary.GetNote(octave, NOTES.Ds);
             case 7: return soundLibrary.GetNote(octave, NOTES.Cs);
             default: 
