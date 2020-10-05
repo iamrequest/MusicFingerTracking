@@ -12,11 +12,15 @@ public class Trumpet : MonoBehaviour {
 
     private Hand hand;
     public SteamVR_Action_Skeleton skeletonAction;
-    public SteamVR_Action_Boolean playSoundAction;
+    public SteamVR_Action_Vector2 playSoundAction;
 
     [Tooltip("The minimum amount of finger curl to count as pressing a valve down")]
     [Range(0f, 1f)]
     public float fingerPressThreshold;
+
+    [Tooltip("The absoulute minimum amount of vertical axis to count as playing a note")]
+    [Range(0f, 1f)]
+    public float notePlayThreshold;
 
     // Start is called before the first frame update
     void Start() {
@@ -44,14 +48,16 @@ public class Trumpet : MonoBehaviour {
         }
     }
 
-    // TODO: This should be an update function, and should change the audio clip when the played note changes
-    private void PlayAudio(SteamVR_Action_Boolean fromAction, SteamVR_Input_Sources fromSource, bool newState) {
-        if (!newState) {
-            audioSource.Stop();
+    private void PlayAudio(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta) {
+        if (Mathf.Abs(axis.y) > notePlayThreshold) {
+            if(!audioSource.isPlaying) audioSource.Play();
+
+            audioSource.volume = RemapFloat(Mathf.Abs(axis.y), notePlayThreshold, 1f, 0f, 1f);
         } else {
-            audioSource.Play();
+            audioSource.Stop();
         }
     }
+
 
     private AudioClip GetPlayedNote() {
         int octave = GetOctave();
@@ -99,5 +105,9 @@ public class Trumpet : MonoBehaviour {
         }
 
         return valveCombo;
+    }
+
+    private float RemapFloat(float value, float from1, float to1, float from2, float to2) {
+        return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
     }
 }
