@@ -15,6 +15,8 @@ public class Trumpet : MonoBehaviour {
     public SteamVR_Action_Skeleton skeletonAction;
     public SteamVR_Action_Vector2 playSoundAction;
 
+    public int overtone;
+
     [Tooltip("The minimum amount of finger curl to count as pressing a valve down")]
     [Range(0f, 1f)]
     public float fingerPressThreshold;
@@ -22,6 +24,10 @@ public class Trumpet : MonoBehaviour {
     [Tooltip("The absoulute minimum amount of vertical axis to count as playing a note")]
     [Range(0f, 1f)]
     public float notePlayThreshold;
+
+    [Header("Valve Control")]
+    public Renderer[] valves;
+    public Material openValveMat, closedValveMat;
 
     // Start is called before the first frame update
     void Start() {
@@ -42,6 +48,8 @@ public class Trumpet : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        UpdateMesh();
+
         AudioClip previousClip = audioSource.clip;
         AudioClip newClip = GetPlayedNote();
 
@@ -68,7 +76,6 @@ public class Trumpet : MonoBehaviour {
     }
 
 
-    public int overtone;
     private AudioClip GetPlayedNote() {
         if (overtone == 2) {
             switch (GetValveCombination()) {
@@ -159,5 +166,21 @@ public class Trumpet : MonoBehaviour {
 
     private float RemapFloat(float value, float from1, float to1, float from2, float to2) {
         return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
+    }
+
+    private void UpdateMesh() {
+        valves[0].material = openValveMat;
+        valves[1].material = openValveMat;
+        valves[2].material = openValveMat;
+
+        if (skeletonAction.indexCurl > fingerPressThreshold) {
+            valves[0].material = closedValveMat;
+        }
+        if (skeletonAction.middleCurl > fingerPressThreshold) {
+            valves[1].material = closedValveMat;
+        }
+        if (skeletonAction.ringCurl > fingerPressThreshold) {
+            valves[2].material = closedValveMat;
+        }
     }
 }
