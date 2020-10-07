@@ -42,7 +42,7 @@ For something in a different route, I'd take a look into a drum set. If the play
 
 ## Credits
 
-* Initial piano audio (used in earlier commits, still in project files, not used anymore): [SingleInfinity on /r/piano](https://www.reddit.com/r/piano/comments/3u6ke7/heres_some_midi_and_mp3_files_for_individual/
+* Initial piano audio (used in earlier commits, still in project files, not used anymore): [by SingleInfinity, from /r/piano](https://www.reddit.com/r/piano/comments/3u6ke7/heres_some_midi_and_mp3_files_for_individual/)
 * Synth audio: Created in famitracker, processed in audacity)
 * Unity Version: 2019.4.5f1
 * VR Plugin: SteamVR v2.6.1 (sdk 1.13.10)
