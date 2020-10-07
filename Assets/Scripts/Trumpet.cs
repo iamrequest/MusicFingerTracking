@@ -10,7 +10,8 @@ public class Trumpet : MonoBehaviour {
     private AudioSource audioSource;
     public AudioLibrary soundLibrary;
 
-    private Hand hand;
+    public Hand primaryHand;
+    private Hand secondaryHand;
     public SteamVR_Action_Skeleton skeletonAction;
     public SteamVR_Action_Vector2 playSoundAction;
 
@@ -27,8 +28,16 @@ public class Trumpet : MonoBehaviour {
         audioSource = GetComponent<AudioSource>();
         audioSource.loop = true;
 
-        hand = GetComponentInParent<Hand>();
-        playSoundAction.AddOnChangeListener(PlayAudio, hand.handType);
+        // Default the primary hand to the right hand
+        if (primaryHand == Player.instance.leftHand) {
+            secondaryHand = Player.instance.rightHand;
+        } else {
+            primaryHand = Player.instance.rightHand;
+            secondaryHand = Player.instance.leftHand;
+        }
+
+        playSoundAction.AddOnChangeListener(PlayAudio, primaryHand.handType);
+        playSoundAction.AddOnUpdateListener(UpdateOvertone, secondaryHand.handType);
     }
 
     // Update is called once per frame
@@ -59,62 +68,66 @@ public class Trumpet : MonoBehaviour {
     }
 
 
-    public int octave;
+    public int overtone;
     private AudioClip GetPlayedNote() {
-        //octave = GetOctave();
-
-        if (octave == 2) {
+        if (overtone == 2) {
             switch (GetValveCombination()) {
-                //case 0: return soundLibrary.GetNote(octave, NOTES.G);
-                case 1: return soundLibrary.GetNote(octave, NOTES.As);
-                case 2: return soundLibrary.GetNote(octave, NOTES.B);
-                case 3: return soundLibrary.GetNote(octave, NOTES.A);
-                //case 4: return soundLibrary.GetNote(octave, NOTES.?);
-                case 5: return soundLibrary.GetNote(octave, NOTES.G);
-                case 6: return soundLibrary.GetNote(octave, NOTES.Gs);
-                case 7: return soundLibrary.GetNote(octave, NOTES.Fs);
+                //case 0: return soundLibrary.GetNote(2, NOTES.G);
+                case 1: return soundLibrary.GetNote(2, NOTES.As);
+                case 2: return soundLibrary.GetNote(2, NOTES.B);
+                case 3: return soundLibrary.GetNote(3, NOTES.A);
+                //case 4: return soundLibrary.GetNote(2, NOTES.?);
+                case 5: return soundLibrary.GetNote(2, NOTES.G);
+                case 6: return soundLibrary.GetNote(2, NOTES.Gs);
+                case 7: return soundLibrary.GetNote(2, NOTES.Fs);
                 default:
-                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    Debug.LogError("No note returned. Overtone: " + overtone + ", Valves: " + GetValveCombination());
                     return null;
             }
-        } else if (octave == 3) {
+        } else if (overtone == 3) {
             switch (GetValveCombination()) {
-                case 0: return soundLibrary.GetNote(octave, NOTES.C);
-                case 1: return soundLibrary.GetNote(octave, NOTES.F);
-                case 2: return soundLibrary.GetNote(octave, NOTES.Fs);
-                case 3: return soundLibrary.GetNote(octave, NOTES.E);
-                case 4: return soundLibrary.GetNote(octave, NOTES.D);
-                case 5: return soundLibrary.GetNote(octave, NOTES.Ds);
-                case 6: return soundLibrary.GetNote(octave, NOTES.Ds);
-                case 7: return soundLibrary.GetNote(octave, NOTES.Cs);
+                case 0: return soundLibrary.GetNote(3, NOTES.C);
+                case 1: return soundLibrary.GetNote(3, NOTES.F);
+                case 2: return soundLibrary.GetNote(3, NOTES.Fs);
+                case 3: return soundLibrary.GetNote(3, NOTES.E);
+                //case 4: return soundLibrary.GetNote(3, NOTES.?);
+                case 5: return soundLibrary.GetNote(3, NOTES.D);
+                case 6: return soundLibrary.GetNote(3, NOTES.Ds);
+                case 7: return soundLibrary.GetNote(3, NOTES.Cs);
                 default:
-                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    Debug.LogError("No note returned. Overtone: " + overtone + ", Valves: " + GetValveCombination());
                     return null;
             }
-        } else if (octave == 4) {
+        } else if (overtone == 4) {
             switch (GetValveCombination()) {
-                case 0: return soundLibrary.GetNote(octave, NOTES.G);
-                case 1: return soundLibrary.GetNote(octave, NOTES.As);
-                case 2: return soundLibrary.GetNote(octave, NOTES.B);
-                case 3: return soundLibrary.GetNote(octave, NOTES.A);
-                //case 4: return soundLibrary.GetNote(octave, NOTES.?);
-                //case 5: return soundLibrary.GetNote(octave, NOTES.?);
-                case 6: return soundLibrary.GetNote(octave, NOTES.Gs);
-                //case 7: return soundLibrary.GetNote(octave, NOTES.?);
+                case 0: return soundLibrary.GetNote(3, NOTES.G);
+                case 1: return soundLibrary.GetNote(3, NOTES.As);
+                case 2: return soundLibrary.GetNote(3, NOTES.B);
+                case 3: return soundLibrary.GetNote(3, NOTES.A);
+                //case 4: return soundLibrary.GetNote(3, NOTES.?);
+                //case 5: return soundLibrary.GetNote(3, NOTES.?);
+                case 6: return soundLibrary.GetNote(3, NOTES.Gs);
+                //case 7: return soundLibrary.GetNote(3, NOTES.?);
                 default:
-                    Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+                    Debug.LogError("No note returned. Overtone: " + overtone + ", Valves: " + GetValveCombination());
                     return null;
             }
         }
 
-        Debug.LogError("No note returned. Octave: " + octave + ", Valves: " + GetValveCombination());
+        Debug.LogError("No note returned. Overtone: " + overtone + ", Valves: " + GetValveCombination());
         return null;
     }
 
-    private int GetOctave() {
-        // TODO: Update this to reflect breath pitch
-        return 3;
+    private void UpdateOvertone(SteamVR_Action_Vector2 fromAction, SteamVR_Input_Sources fromSource, Vector2 axis, Vector2 delta) {
+        if (axis.y > 0.5) {
+            overtone = 4;
+        } else if (axis.y < -0.5) {
+            overtone = 2;
+        } else {
+            overtone = 3;
+        }
     }
+
 
     /// <summary>
     /// Given the finger curl amount on each of the player's finger, return a boolean representation
@@ -124,6 +137,9 @@ public class Trumpet : MonoBehaviour {
     /// Valve 1: +1
     /// Valve 2: +2
     /// Valve 3: +4
+    ///
+    /// So, figure out your fingering with your right hand, and turn your palm to face you.
+    /// The result of your finger placement will be in binary format
     /// </summary>
     /// <returns></returns>
     private int GetValveCombination() {
